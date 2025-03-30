@@ -1,0 +1,10 @@
+results/*
+/embeddings/*
+venv/
+__pycache__/
+*.pyc
+*.json
+*.jsonl
+*.jsonl.gz
+*.jsonl.gz.part
+*.jsonl.gz.part.1
