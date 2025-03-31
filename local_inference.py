@@ -25,7 +25,11 @@ class OllamaInference:
         Returns:
             dict: The API response
         """
-        response = requests.post(f"{self.base_url}/{endpoint}", json=data)
+        if endpoint == "api/tags":
+            response = requests.get(f"{self.base_url}/{endpoint}")
+        else:
+            response = requests.post(f"{self.base_url}/{endpoint}", json=data)
+        
         response.raise_for_status()
         return response.json()
 
@@ -99,16 +103,15 @@ def main():
     # Example usage
     client = OllamaInference()
     
-    # Pull all models
-    models = ["deepseek-r1-1.5b", "llama3.2-1b", "qwen2.5-1.5b"]
-    
-    for model in models:
-        try:
-            print(f"\nPulling {model}...")
-            client.pull_model(model)
-            print(f"Successfully pulled {model}")
-        except Exception as e:
-            print(f"Error pulling {model}: {e}")
+    # First, list available models
+    try:
+        available_models = client.list_models()
+        print("\nAvailable models:")
+        for model in available_models.get("models", []):
+            print(f"- {model['name']}")
+    except Exception as e:
+        print(f"Error listing models: {e}")
+        return
     
     # Test generation with DeepSeek
     try:
