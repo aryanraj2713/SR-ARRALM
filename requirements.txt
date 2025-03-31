@@ -1,6 +1,7 @@
 requests>=2.31.0
 python-dotenv>=1.0.0
-numpy>=1.26.0
+numpy>=1.21.6,<1.28.0
+scipy>=1.11.0
 pandas>=2.1.0
 datasets>=2.16.0
 tqdm>=4.66.0 
