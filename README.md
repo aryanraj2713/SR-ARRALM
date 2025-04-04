@@ -2,6 +2,25 @@
 
 This project provides a Python interface for local inference using Ollama with three different models, featuring both basic inference and Retrieval-Augmented Generation (RAG) capabilities.
 
+## Quick Start
+
+1. Install Ollama from [https://ollama.ai/](https://ollama.ai/)
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the complete analysis with a single command:
+   ```bash
+   python run_all_models.py
+   ```
+4. View the results:
+   - Open `results/report/source_attribution_report.md` in your preferred markdown viewer
+   - The report includes:
+     - Overall summary of model performance
+     - Detailed results for each model
+     - Visualizations of accuracy and confidence distributions
+     - Question-by-question analysis
+
 ## Project Structure
 
 ```
@@ -17,7 +36,10 @@ This project provides a Python interface for local inference using Ollama with t
 ├── data/                  # Data storage
 │   └── embeddings/       # Cached embeddings
 ├── results/              # Output directory
-│   └── rag_results.json  # RAG test results
+│   ├── report/          # Generated reports
+│   │   ├── assets/     # Report visualizations
+│   │   └── source_attribution_report.md  # Main report
+│   └── source_testing_results.json  # Raw test results
 ├── requirements.txt      # Project dependencies
 └── README.md            # Project documentation
 ```
@@ -155,7 +177,8 @@ print(result["answer"])
 - First-time model usage triggers automatic download
 - Ollama service must be running for inference
 - Test results are stored in the `results/` directory
-- Embeddings are cached in the `data/embeddings/` directory 
+- Embeddings are cached in the `data/embeddings/` directory
+- Reports are generated in `results/report/` with visualizations in `results/report/assets/`
 
 PYTHONPATH=/Users/aryanraj/Developer/final_year python utils/source_testing.py --models "deepseek-r1-1.5b"
 

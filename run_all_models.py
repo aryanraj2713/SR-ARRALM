@@ -143,10 +143,10 @@ def generate_markdown_report(models_results):
                 report += f"#### {cat}\n"
                 report += f"- Accuracy: {accuracy:.1f}% ({correct}/{total})\n\n"
         
-        # Visualizations with correct relative paths
+        # Visualizations with relative paths
         report += "#### Visualizations\n\n"
-        report += f"![Accuracy Distribution](assets/accuracy_{model_name}.png)\n\n"
-        report += f"![Confidence Distribution](assets/confidence_{model_name}.png)\n\n"
+        report += f'<img src="assets/accuracy_{model_name}.png" alt="Accuracy Distribution" width="800"/>\n\n'
+        report += f'<img src="assets/confidence_{model_name}.png" alt="Confidence Distribution" width="800"/>\n\n'
         
         # Detailed results
         report += "#### Question Details\n\n"
