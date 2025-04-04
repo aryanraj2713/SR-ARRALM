@@ -179,4 +179,11 @@ print(result["answer"])
 - Embeddings are cached in the `data/embeddings/` directory
 - Reports are generated in `results/report/` with visualizations in `results/report/assets/`
 
-
+```
+@article{raj2025structured,
+  author = {Raj, Aryan and Garg, Astitva Veer and Anitha, D.},
+  title = {Structured Relevance Assessment for Robust Retrieval-Augmented Language Models},
+  year = {2025},
+  email = {aryanraj2713@gmail.com, gargveerastitva@gmail.com, anithad@srmist.edu.in}
+}
+```
