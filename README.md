@@ -3,7 +3,7 @@
 
 ## Quick Start
 
-1. Install Ollama from [https://ollama.ai/](https://ollama.ai/)
+1. Install Ollama from [https://ollama.ai/](https://ollama.ai/) and create a virtual-environment (optional)
 2. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
