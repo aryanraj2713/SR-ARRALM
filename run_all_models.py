@@ -3,10 +3,12 @@ import os
 import sys
 import json
 import time
+import shutil
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import numpy as np
 
 def ensure_ollama_running():
     """Check if Ollama is running and start it if needed."""
@@ -35,10 +37,11 @@ def run_model_test(model_name):
                 return all_results[model_name]
     return None
 
-def generate_visualizations(results, model_name):
+def generate_visualizations(results, model_name, report_dir):
     """Generate visualizations for model results."""
-    # Create results directory if it doesn't exist
-    Path("results").mkdir(exist_ok=True)
+    # Create report assets directory if it doesn't exist
+    assets_dir = os.path.join(report_dir, "assets")
+    Path(assets_dir).mkdir(parents=True, exist_ok=True)
     
     # Prepare data
     categories = ['RAG_DATASET', 'TRAINING_DATA', 'HALLUCINATION']
@@ -60,29 +63,48 @@ def generate_visualizations(results, model_name):
                 else:
                     confidences[cat].append(0.0)
     
-    # Plot accuracy distribution
+    # Plot accuracy bar chart instead of histogram
     plt.figure(figsize=(10, 6))
-    sns.histplot(accuracies, bins=20)
-    plt.title(f'Accuracy Distribution - {model_name}')
-    plt.xlabel('Accuracy')
-    plt.ylabel('Count')
-    plt.savefig(f'results/accuracy_dist_{model_name}.png')
+    categories_present = [cat for cat in categories if cat in results]
+    accuracies = [sum(1 for q in results[cat] if q['source'] == q['expected_source'])/len(results[cat])*100 for cat in categories_present]
+    plt.bar(categories_present, accuracies)
+    plt.title(f'Accuracy by Category - {model_name}')
+    plt.xlabel('Category')
+    plt.ylabel('Accuracy (%)')
+    plt.ylim(0, 100)
+    for i, v in enumerate(accuracies):
+        plt.text(i, v + 1, f'{v:.1f}%', ha='center')
+    plt.savefig(os.path.join(assets_dir, f'accuracy_{model_name}.png'))
     plt.close()
     
-    # Plot confidence distribution by source
+    # Plot confidence bar chart instead of density plot
     plt.figure(figsize=(12, 6))
-    for cat in categories:
-        if confidences[cat]:
-            sns.kdeplot(data=confidences[cat], label=cat)
+    for i, cat in enumerate(categories_present):
+        conf_counts = {'HIGH': 0, 'MEDIUM': 0, 'LOW': 0}
+        for q in results[cat]:
+            conf_counts[q['confidence']] += 1
+        total = len(results[cat])
+        conf_percentages = [conf_counts[level]/total*100 for level in ['HIGH', 'MEDIUM', 'LOW']]
+        x = np.arange(len(categories_present))
+        width = 0.25
+        plt.bar(x + i*width, conf_percentages, width, label=cat)
+        
     plt.title(f'Confidence Distribution by Source - {model_name}')
-    plt.xlabel('Confidence')
-    plt.ylabel('Density')
+    plt.xlabel('Confidence Level')
+    plt.ylabel('Percentage')
+    plt.xticks(x + width, ['HIGH', 'MEDIUM', 'LOW'])
     plt.legend()
-    plt.savefig(f'results/confidence_dist_{model_name}.png')
+    plt.savefig(os.path.join(assets_dir, f'confidence_{model_name}.png'))
     plt.close()
+    
+    return assets_dir
 
 def generate_markdown_report(models_results):
     """Generate a markdown report with results and visualizations."""
+    # Create report directory
+    report_dir = "results/report"
+    Path(report_dir).mkdir(parents=True, exist_ok=True)
+    
     report = "# Source Attribution Analysis Report\n\n"
     report += f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     
@@ -108,6 +130,9 @@ def generate_markdown_report(models_results):
     for model_name, results in models_results.items():
         report += f"### {model_name}\n\n"
         
+        # Generate visualizations for this model
+        assets_dir = generate_visualizations(results, model_name, report_dir)
+        
         # Summary statistics
         categories = ['RAG_DATASET', 'TRAINING_DATA', 'HALLUCINATION']
         for cat in categories:
@@ -118,10 +143,10 @@ def generate_markdown_report(models_results):
                 report += f"#### {cat}\n"
                 report += f"- Accuracy: {accuracy:.1f}% ({correct}/{total})\n\n"
         
-        # Visualizations
+        # Visualizations with correct relative paths
         report += "#### Visualizations\n\n"
-        report += f"![Accuracy Distribution](results/accuracy_dist_{model_name}.png)\n\n"
-        report += f"![Confidence Distribution](results/confidence_dist_{model_name}.png)\n\n"
+        report += f"![Accuracy Distribution](assets/accuracy_{model_name}.png)\n\n"
+        report += f"![Confidence Distribution](assets/confidence_{model_name}.png)\n\n"
         
         # Detailed results
         report += "#### Question Details\n\n"
@@ -135,14 +160,18 @@ def generate_markdown_report(models_results):
                     report += f"  - Confidence: {q['confidence']}\n\n"
     
     # Save report
-    with open("results/source_attribution_report.md", 'w') as f:
+    report_file = os.path.join(report_dir, "source_attribution_report.md")
+    with open(report_file, 'w') as f:
         f.write(report)
     
     # Convert to PDF if pandoc is available
     try:
-        os.system("pandoc results/source_attribution_report.md -o results/source_attribution_report.pdf")
+        os.system(f"cd {report_dir} && pandoc source_attribution_report.md -o source_attribution_report.pdf")
     except:
         print("Pandoc not available. PDF generation skipped.")
+    
+    print(f"\nReport generated at: {report_file}")
+    return report_dir
 
 def main():
     # Ensure Ollama is running
@@ -161,12 +190,11 @@ def main():
         results = run_model_test(model)
         if results:
             models_results[model] = results
-            generate_visualizations(results, model)
     
     # Generate report
-    generate_markdown_report(models_results)
+    report_dir = generate_markdown_report(models_results)
     
-    print("\nAnalysis complete! Check results/source_attribution_report.md for the full report.")
+    print(f"\nAnalysis complete! Check {os.path.join(report_dir, 'source_attribution_report.md')} for the full report.")
     print("A PDF version has also been generated if pandoc was available.")
 
 if __name__ == "__main__":
