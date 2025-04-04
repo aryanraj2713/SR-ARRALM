@@ -1,4 +1,4 @@
-from rag_inference import RAGInference
+from core.rag_inference import RAGInference
 import time
 import json
 from typing import Dict, Any
@@ -31,6 +31,7 @@ def test_rag(model_name: str, questions: list) -> Dict[str, Any]:
             total_duration += duration
             
             print(f"Answer: {result['answer']}")
+            print(f"Source: {result['source']}")
             print(f"Duration: {duration:.2f} seconds")
             print("Retrieved Contexts:")
             for i, context in enumerate(result["contexts"], 1):
@@ -41,6 +42,7 @@ def test_rag(model_name: str, questions: list) -> Dict[str, Any]:
             results.append({
                 "question": question,
                 "answer": result["answer"],
+                "source": result["source"],
                 "duration": duration,
                 "contexts": result["contexts"]
             })

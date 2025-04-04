@@ -1,4 +1,4 @@
-from local_inference import OllamaInference
+from core.base_inference import OllamaInference
 import time
 import json
 

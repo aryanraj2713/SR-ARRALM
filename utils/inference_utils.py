@@ -1,4 +1,4 @@
-from local_inference import OllamaInference
+from core.base_inference import OllamaInference
 import time
 
 def get_inference(model_name: str, prompt: str, max_tokens: int = 200, temperature: float = 0.7) -> None:

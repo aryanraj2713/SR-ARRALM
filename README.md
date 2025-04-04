@@ -1,9 +1,42 @@
 # Local LLM Inference with Ollama
 
-This project provides a Python interface for local inference using Ollama with three different models:
-- DeepSeek Coder 1.3B (replacing DeepSeek-R1-1.5B)
-- Llama 3.2 1B
-- Qwen2 Math 1.5B
+This project provides a Python interface for local inference using Ollama with three different models, featuring both basic inference and Retrieval-Augmented Generation (RAG) capabilities.
+
+## Project Structure
+
+```
+.
+├── core/                   # Core implementation files
+│   ├── base_inference.py  # Base inference implementation
+│   └── rag_inference.py   # RAG implementation
+├── tests/                 # Test files
+│   ├── base_tests.py     # Basic model tests
+│   └── rag_tests.py      # RAG-specific tests
+├── utils/                 # Utility scripts
+│   └── inference_utils.py # Helper functions for inference
+├── data/                  # Data storage
+│   └── embeddings/       # Cached embeddings
+├── results/              # Output directory
+│   └── rag_results.json  # RAG test results
+├── requirements.txt      # Project dependencies
+└── README.md            # Project documentation
+```
+
+## Supported Models
+
+1. **DeepSeek Coder 1.3B** (776MB)
+   - Optimized for code generation and understanding
+   - Trained on two trillion code and natural language tokens
+
+2. **Llama 3.2 1B** (1.3GB)
+   - Meta's latest 1B parameter model
+   - Optimized for edge devices
+   - Balanced performance and resource usage
+
+3. **Qwen2 Math 1.5B** (934MB)
+   - Specialized math language model
+   - Built upon Qwen2
+   - Optimized for mathematical reasoning
 
 ## Prerequisites
 
@@ -38,37 +71,36 @@ When you run `client.pull_model()`, the model weights are downloaded from Ollama
 
 2. Run the basic inference example:
    ```bash
-   python local_inference.py
+   python core/base_inference.py
    ```
 
 3. Run the inference tests:
    ```bash
-   python test_inference.py
+   python tests/base_tests.py
    ```
 
 ### RAG (Retrieval-Augmented Generation) Inference
 
 1. Run the RAG inference example:
    ```bash
-   python rag_inference.py
+   python core/rag_inference.py
    ```
 
 2. Run the RAG tests:
    ```bash
-   python rag_test.py
+   python tests/rag_tests.py
    ```
 
 ### Using the API in Your Code
 
-You can use the `OllamaInference` class in your code:
-
+#### Basic Inference
 ```python
-from local_inference import OllamaInference
+from core.base_inference import OllamaInference
 
 client = OllamaInference()
 
 # Pull a model
-client.pull_model("deepseek-r1-1.5b")  # This will pull deepseek-coder:1.3b
+client.pull_model("deepseek-r1-1.5b")
 
 # Generate text
 response = client.generate(
@@ -80,38 +112,50 @@ response = client.generate(
 print(response["response"])
 ```
 
-## Available Models
+#### RAG Inference
+```python
+from core.rag_inference import RAGInference
 
-- `deepseek-r1-1.5b`: Maps to DeepSeek Coder 1.3B (776MB)
-  - A capable coding model trained on two trillion code and natural language tokens
-  - Optimized for code generation and understanding
-  - Size: 776MB
+# Initialize RAG with a specific model
+rag = RAGInference("deepseek-r1-1.5b")
 
-- `llama3.2-1b`: Maps to Llama 3.2 1B (1.3GB)
-  - Meta's latest 1B parameter model optimized for edge devices
-  - Balanced performance and resource usage
-  - Size: 1.3GB
+# Get an answer with context
+result = rag.answer_question("Your question here")
+print(result["answer"])
+```
 
-- `qwen2.5-1.5b`: Maps to Qwen2 Math 1.5B (934MB)
-  - Specialized math language model built upon Qwen2
-  - Optimized for mathematical reasoning and problem-solving
-  - Size: 934MB
+## Data Flow
+
+1. **User Query** → RAGInference
+2. **Context Retrieval** → Embedding Comparison
+3. **Context Augmentation** → Model Generation
+4. **Result Storage** → JSON Output
 
 ## API Reference
 
 ### OllamaInference Class
 
 #### Methods
-
-- `generate(model_name, prompt, max_tokens=None, temperature=0.7, top_p=0.9, stop=None, stream=False)`: Generate text using the specified model
-- `list_models()`: List all available models
+- `generate(model_name, prompt, max_tokens=None, temperature=0.7, top_p=0.9, stop=None, stream=False)`: Generate text
+- `list_models()`: List available models
 - `pull_model(model_name)`: Pull a model from Ollama
+
+### RAGInference Class
+
+#### Methods
+- `get_embedding(text)`: Convert text to vector
+- `compute_similarity(query_embedding, doc_embedding)`: Calculate similarity
+- `retrieve_relevant_context(query, k=3)`: Get relevant contexts
+- `answer_question(question)`: Generate RAG-based answer
 
 ## Notes
 
-- The models are stored locally using Ollama
-- Make sure you have sufficient disk space for the models (approximately 3GB total)
-- The first time you use a model, it will be downloaded automatically
-- The Ollama service must be running for the inference to work
-- If you see "address already in use" error when starting Ollama, it means the service is already running
-- Test results are stored in the `results/` directory 
+- Models are stored locally using Ollama
+- Ensure sufficient disk space (approximately 3GB total)
+- First-time model usage triggers automatic download
+- Ollama service must be running for inference
+- Test results are stored in the `results/` directory
+- Embeddings are cached in the `data/embeddings/` directory 
+
+PYTHONPATH=/Users/aryanraj/Developer/final_year python utils/source_testing.py --models "deepseek-r1-1.5b"
+
