@@ -1,6 +1,5 @@
-# Local LLM Inference with Ollama
+# Structured Relevance Assessment for Robust Retrieval-Augmented Language Models
 
-This project provides a Python interface for local inference using Ollama with three different models, featuring both basic inference and Retrieval-Augmented Generation (RAG) capabilities.
 
 ## Quick Start
 
@@ -180,5 +179,4 @@ print(result["answer"])
 - Embeddings are cached in the `data/embeddings/` directory
 - Reports are generated in `results/report/` with visualizations in `results/report/assets/`
 
-PYTHONPATH=/Users/aryanraj/Developer/final_year python utils/source_testing.py --models "deepseek-r1-1.5b"
 
