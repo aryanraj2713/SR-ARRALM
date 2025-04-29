@@ -43,7 +43,7 @@
 └── README.md            # Project documentation
 ```
 
-## Supported Models
+## Supported Models (Small Language Models)
 
 1. **DeepSeek Coder 1.3B** (776MB)
    - Optimized for code generation and understanding
@@ -63,12 +63,12 @@
 
 1. Install Ollama from [https://ollama.ai/](https://ollama.ai/)
 2. Python 3.8 or higher
-3. pip (Python package manager)
+3. pip/conda/uv/ or other python package manager
 
 ## Setup
 
 1. Clone this repository
-2. Install the required Python packages:
+2. Install the required Python packages(change according to your package manager):
    ```bash
    pip install -r requirements.txt
    ```
@@ -179,6 +179,11 @@ print(result["answer"])
 - Embeddings are cached in the `data/embeddings/` directory
 - Reports are generated in `results/report/` with visualizations in `results/report/assets/`
 
+# Contribution
+This repository is part of ongoing research work. While we are committed to building in the open and sharing our progress, the codebase represents extensive effort and many hours of development.If you use this code or any part of it in your own work, please cite both the code and the corresponding research publication(s). Proper attribution is the only acknowledgment we request in return for making this resource available. We plan to open the repository for external contributions soon. Until then, you are welcome to create issues for bug reports, feature suggestions, or general questions.
+
+Thank you for your understanding and respect for our work.
+
 ## For Code use :
 ```
 @article{raj2025structured,
@@ -199,7 +204,4 @@ print(result["answer"])
   note         = {Preprint},
   howpublished = {\url{mailto:gargveerastitva@gmail.com}},
 }
-
-
-
 ```
